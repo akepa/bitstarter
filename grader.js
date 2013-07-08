@@ -64,6 +64,19 @@ var clone = function(fn) {
     return fn.bind({});
 };
 
+function processUrl(response){
+	if (response instanceof Error) {
+				sys.puts('Error: ' + result.message);
+				this.retry(5000); // try again after 5 sec
+			} else {
+				fs.writeFileSync("downloaded.html", response);
+				program.file="downloaded.html";
+				checkJson = checkHtmlFile(program.file, program.checks);
+				var outJson = JSON.stringify(checkJson, null, 4);
+				console.log(outJson);
+			}
+}
+
 
 if(require.main == module) {
     program
@@ -80,18 +93,7 @@ if(require.main == module) {
 	}
 	if(program.url != null){
 		//console.log("Url:" + program.url);
-		rest.get(program.url).on('complete', function(result){
-			if (result instanceof Error) {
-				sys.puts('Error: ' + result.message);
-				this.retry(5000); // try again after 5 sec
-			} else {
-				fs.writeFileSync("downloaded.html", result);
-				program.file="downloaded.html";
-				checkJson = checkHtmlFile(program.file, program.checks);
-				var outJson = JSON.stringify(checkJson, null, 4);
-				console.log(outJson);
-			}
-		});
+		rest.get(program.url).on('complete', processUrl);
 	}
     
 } else {
